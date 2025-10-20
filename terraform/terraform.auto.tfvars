@@ -1,0 +1,2 @@
+ssh_public_key="keys/github_sdo_key.pub"
+allow_all_ip_addresses_to_db_server=false
