@@ -81,5 +81,5 @@ jobs:
             --ssh-common-args='-o StrictHostKeyChecking=accept-new'
       
       - name: Terminate infrastructure
-        if: ${{ !cancelled() }}
+        if: ${{ !success() }}
         run: terraform -chdir=./terraform destroy -auto-approve
