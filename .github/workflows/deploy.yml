@@ -45,7 +45,7 @@ jobs:
           chmod 644 ~/.ssh/aws_ssh.pub
       
       - name: Fetch current IP and configure Terraform variables
-        run: printf 'ip_address = "%s"' "$(curl -s ifconfig.co/)" > terraform/ip.auto.tfvars
+        run: printf "ip_address = \"$(curl -s https://api.ipify.org)\"" > terraform/ip.auto.tfvars
       
       - name: Initiate Terraform session
         run: terraform -chdir=./terraform init
