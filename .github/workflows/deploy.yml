@@ -46,12 +46,7 @@ jobs:
       
       - name: Fetch current IP and configure Terraform variables
         run: |
-          ip=$(curl -s ifconfig.co/)
-          cat > terraform/terraform.auto.tfvars <<EOF
-          ip_address = "$ip"
-          ssh_public_key = "$(cat ~/.ssh/aws_ssh.pub)"
-          allow_all_ip_addresses_to_db_server = false
-          EOF
+          printf "ip_address = \"$(curl -s ifconfig.co/)\"" > terraform/ip.auto.tfvars
       
       - name: Initiate Terraform session
         run: terraform -chdir=./terraform init
