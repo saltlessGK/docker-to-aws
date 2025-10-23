@@ -56,6 +56,9 @@ jobs:
       - name: Deploy infrastructure
         run: terraform -chdir=./terraform apply -auto-approve
       
+      - name: Wait for servers to be ready
+        run: sleep 60
+      
       - name: Run Docker playbook
         run: |
           ansible-playbook -i ansible/inventory.yml ansible/docker-playbook.yml \
