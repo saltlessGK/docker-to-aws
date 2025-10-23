@@ -1,0 +1,19 @@
+---
+- name: Setup frontend container
+  hosts: frontend
+  remote_user: ubuntu
+  become: yes
+  vars:
+    PORT: "8081"
+    BACKEND_URL: "http://{{ hostvars['backend']['private_host'] }}:8080"
+  tasks:
+    - name: Run frontend container
+      community.docker.docker_container:
+        name: frontend
+        image: rmitdominichynes/sdo-2025:frontend
+        restart_policy: always
+        ports:
+          - "8081:8081"
+        env:
+          PORT: "{{ PORT }}"
+          BACKEND_URL: "{{ BACKEND_URL }}"

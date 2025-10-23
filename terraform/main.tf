@@ -1,0 +1,63 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+  }
+}
+
+# Configure the AWS Provider
+provider "aws" {
+  region = "us-east-1"
+}
+
+locals {
+  allowed_cidrs = var.allow_all_ip_addresses_to_db_server ? ["0.0.0.0/0"] : ["${var.ip_address}/32"]
+}
+
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"] # Canonical
+}
+
+resource "aws_key_pair" "admin" {
+  key_name   = "admin-key"
+  public_key = file(var.ssh_public_key)
+}
+
+module "security_groups" {
+  source = "./infra/security_groups"
+  allowed_cidrs = local.allowed_cidrs
+}
+
+module "instances" {
+  source = "./infra/instances"
+  ami_id = data.aws_ami.ubuntu.id
+  ssh_public_key = aws_key_pair.admin.key_name
+  frontend_sg_id = module.security_groups.frontend_sg_id
+  backend_sg_id = module.security_groups.backend_sg_id
+  db_sg_id = module.security_groups.db_sg_id
+}
+
+resource "local_file" "inventory" {
+  content = templatefile("${path.module}/../ansible/inventory.tpl", {
+    frontend_ip = module.instances.frontend_address
+    backend_ip = module.instances.backend_address
+    backend_private_ip = module.instances.backend_private_address
+    db_ip = module.instances.db_address
+    db_private_ip = module.instances.db_private_address
+  })
+  filename = "${path.module}/../ansible/inventory.yml"
+}

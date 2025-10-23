@@ -1,5 +1,9 @@
 node_modules
 .env
 .terraform
-terraform.tfstate
-terraform.tfstate.backup
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+inventory.yml
+ip.auto.tfvars

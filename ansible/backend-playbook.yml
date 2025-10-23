@@ -1,0 +1,23 @@
+---
+- name: Setup backend container
+  hosts: backend
+  remote_user: ubuntu
+  become: yes
+  vars:
+    PORT: "8080"
+    DB_USER: "foo-user"
+    DB_PASSWORD: "secret-foo-password"
+    DB_HOST: "{{ hostvars['db']['private_host'] }}"
+  tasks:
+    - name: Run backend container
+      docker_container:
+        name: backend
+        image: rmitdominichynes/sdo-2025:backend
+        restart_policy: always
+        ports:
+          - "8080:8080"
+        env:
+          PORT: "{{ PORT }}"
+          DB_USER: "{{ DB_USER }}"
+          DB_PASSWORD: "{{ DB_PASSWORD }}"
+          DB_HOST: "{{ DB_HOST }}"
