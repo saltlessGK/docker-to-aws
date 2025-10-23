@@ -1,0 +1,21 @@
+---
+- name: Setup database container
+  hosts: db
+  remote_user: ubuntu
+  become: yes
+  vars:
+    POSTGRES_USER: "foo-user"
+    POSTGRES_PASSWORD: "secret-foo-password"
+    POSTGRES_DB: "posts"
+  tasks:
+    - name: Run Postgres container
+      docker_container:
+        name: db
+        image: rmitdominichynes/sdo-2025:db
+        restart_policy: always
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRES_USER: "{{ POSTGRES_USER }}"
+          POSTGRES_PASSWORD: "{{ POSTGRES_PASSWORD }}"
+          POSTGRES_DB: "{{ POSTGRES_DB }}"

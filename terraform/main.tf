@@ -42,23 +42,22 @@ module "security_groups" {
   allowed_cidrs = local.allowed_cidrs
 }
 
-module "frontend" {
-  source = "./infra/frontend"
+module "instances" {
+  source = "./infra/instances"
   ami_id = data.aws_ami.ubuntu.id
   ssh_public_key = aws_key_pair.admin.key_name
   frontend_sg_id = module.security_groups.frontend_sg_id
-}
-
-module "backend" {
-  source = "./infra/backend"
-  ami_id = data.aws_ami.ubuntu.id
-  ssh_public_key = aws_key_pair.admin.key_name
   backend_sg_id = module.security_groups.backend_sg_id
+  db_sg_id = module.security_groups.db_sg_id
 }
 
-module "db" {
-  source = "./infra/db"
-  ami_id = data.aws_ami.ubuntu.id
-  ssh_public_key = aws_key_pair.admin.key_name
-  db_sg_id = module.security_groups.db_sg_id
+resource "local_file" "inventory" {
+  content = templatefile("${path.module}/../ansible/inventory.tpl", {
+    frontend_ip = module.instances.frontend_address
+    backend_ip = module.instances.backend_address
+    backend_private_ip = module.instances.backend_private_address
+    db_ip = module.instances.db_address
+    db_private_ip = module.instances.db_private_address
+  })
+  filename = "${path.module}/../ansible/inventory.yml"
 }

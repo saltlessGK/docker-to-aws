@@ -2,7 +2,7 @@ resource "aws_security_group" "frontend" {
   name = "frontend-sg"
   description = "Allow global HTTP access"
 
-  # SSH in
+  # SSH (Manual) in
   ingress {
     from_port   = 22
     to_port     = 22
@@ -10,9 +10,17 @@ resource "aws_security_group" "frontend" {
     cidr_blocks = var.allowed_cidrs
   }
 
+  # SSH (EC2 Connect) in
   ingress {
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    prefix_list_ids = ["pl-0e4bcff02b13bef1e"]
+  }
+
+  ingress {
+    from_port   = 8081
+    to_port     = 8081
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -40,11 +48,19 @@ resource "aws_security_group" "backend" {
     protocol    = "tcp"
     cidr_blocks = var.allowed_cidrs
   }
+
+  # SSH (EC2 Connect) in
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    prefix_list_ids = ["pl-0e4bcff02b13bef1e"]
+  }
   
   # HTTP in
   ingress {
-    from_port       = 8081
-    to_port         = 8081
+    from_port       = 8080
+    to_port         = 8080
     protocol        = "tcp"
     security_groups = [aws_security_group.frontend.id]
   }
@@ -67,10 +83,18 @@ resource "aws_security_group" "db" {
 
   # SSH in
   ingress {
-    from_port   = 0
+    from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = var.allowed_cidrs
+  }
+
+  # SSH (EC2 Connect) in
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    prefix_list_ids = ["pl-0e4bcff02b13bef1e"]
   }
 
   # PostgreSQL in

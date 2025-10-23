@@ -1,0 +1,56 @@
+---
+- name: Configure servers
+  hosts: all_servers
+  remote_user: ubuntu
+  become: yes # sudo
+
+  tasks:
+  - name: Update packages
+    apt:
+      update_cache: yes
+
+  - name: Install required system packages for Docker
+    apt:
+      pkg:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - software-properties-common
+        - python3-pip
+        - virtualenv
+        - python3-setuptools
+        - gnupg
+      state: latest
+      update_cache: true
+
+  - name: Add Docker GPG apt Key
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+
+  - name: Add Docker Repository
+    apt_repository:
+      repo: deb https://download.docker.com/linux/ubuntu jammy stable
+      state: present
+      filename: docker
+
+  - name: Update apt and install dependencies
+    apt:
+      pkg:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-buildx-plugin
+        - docker-compose-plugin
+      state: latest
+      update_cache: true
+
+  - name: Install Python Docker SDK
+    pip:
+      name: docker
+
+  - name: Ensure Docker is started
+    systemd:
+      name: docker
+      state: started
+      enabled: true
