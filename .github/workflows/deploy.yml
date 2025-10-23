@@ -8,6 +8,8 @@ jobs:
     name: Servers Deployment
     runs-on: ubuntu-latest
     env:
+      AWS_ACCOUNT: 439858384672
+      AWS_ROLE: LabRole
       AWS_REGION: us-east-1
     steps:
       - name: Checkout repository
@@ -16,9 +18,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.SESSION_TOKEN }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/${{ env.AWS_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
       
       - name: Configure Terraform
