@@ -70,4 +70,4 @@ To terminate them afterwards, run `bash destroy.sh` in the same directory.
 
 ## Deploying from GitHub Actions
 
-All steps have been defined in the `deploy.yml` workflow file; however, for every AWS sessions, update the secrets `ACCESS_KEY_ID`, `SECRET_ACCESS_KEY` and `SESSION_TOKEN` in GitHub Secrets with their respective correct values.
+All steps have been defined in the `deploy.yml` workflow file; however, for every AWS sessions, define or update the secrets `ACCESS_KEY_ID`, `SECRET_ACCESS_KEY` and `SESSION_TOKEN` in GitHub Secrets with their respective correct values.
