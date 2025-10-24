@@ -38,7 +38,7 @@ jobs:
       
       - name: Setup SSH keys
         run: |
-          printf '/home/runner/.ssh/aws_ssh\n\n\n' | ssh-keygen -t rsa -b 4096
+          printf '\n\n' | ssh-keygen -f /home/runner/.ssh/aws_ssh -t ed25519
           chmod 600 /home/runner/.ssh/aws_ssh
           chmod 644 /home/runner/.ssh/aws_ssh.pub
           printf "ssh_public_key=\"/home/runner/.ssh/aws_ssh.pub\"\n" > $GITHUB_WORKSPACE/terraform/ssh.auto.tfvars
