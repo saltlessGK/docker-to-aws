@@ -41,18 +41,33 @@ This is the Frontend Posts Service. It is responsible for serving a UI to users 
 ### Image
 The Frontend service image is available at `rmitdominichynes/sdo-2025:frontend`.
 
-
 # Running The Services Locally (In Docker)
+
 1. Run `docker compose up -d` to start the two services, and a postgres database container.
 2. View the Frontend Posts Service at `http://localhost:8081`, and the Backend Posts Service at `http://localhost:8080`.
 
-# Deploying The Services
+## Deploying From Local Repository
 
-The services can be deployed to EC2. 
+This repository is designed to work on WSL Ubuntu (or any other native Linux distributions).
 
-Each container needs: 
-- The correct environment variables configured (refer to the above sections)
-- Security Groups will need to be configured to allow traffic to reach the instances. 
-    - They will also need to be configured to allow the instances to talk to each other, if the services are deployed on different instances.
-    - The PostgreSQL database receives inbound traffic on port `5432`
-    - The ports used by the Backend and Frontend services are configurable through the `PORT` environment variable. Otherwise, it will default to port `8081`.
+### Configurations
+
+1. Install Terraform and Ansible on the WSL environment:
+
+`sudo snap install terraform --classic`
+
+`sudo apt install ansible`
+
+2. Run `ssh-keygen -f ~/.ssh/aws_ssh -t ed25519` to generate a key pair at `~/.ssh` depending on your WSL environment. To simplify the deployment process in later steps, it is recommended to generate the key pair without any passphrase.
+
+3. Set the correct AWS configs and credentials in the `.aws` folder depending on the local environment.
+
+### Deployment
+
+To deploy the defined infrastructure, run `bash deploy.sh` in the repository's root directory.
+
+To terminate them afterwards, run `bash destroy.sh` in the same directory.
+
+## Deploying from GitHub Actions
+
+All steps have been defined in the `deploy.yml` workflow file; however, for every AWS sessions, update the secrets `ACCESS_KEY_ID`, `SECRET_ACCESS_KEY` and `SESSION_TOKEN` in GitHub Secrets with their respective correct values.
