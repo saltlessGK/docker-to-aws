@@ -38,16 +38,15 @@ jobs:
       
       - name: Setup SSH key
         run: |
-          mkdir -p ~/.ssh
-          printf '%s\n' "-----BEGIN OPENSSH PRIVATE KEY-----\n${{ secrets.AWS_SSH }}\n-----END OPENSSH PRIVATE KEY-----" > ~/.ssh/aws_ssh
-          chmod 600 ~/.ssh/aws_ssh
-          printf "${{ secrets.AWS_PUBLIC }}" > ~/.ssh/aws_ssh.pub
-          chmod 644 ~/.ssh/aws_ssh.pub
+          printf '/home/runner/.ssh/aws_ssh\n\n\n' | ssh-keygen -t rsa -b 4096
+          chmod 600 /home/runner/.ssh/aws_ssh
+          chmod 644 /home/runner/.ssh/aws_ssh.pub
+          printf "ssh_public_key=\"/home/runner/.ssh/aws_ssh.pub\"\nallow_all_ip_addresses_to_db_server=true\n" > $GITHUB_WORKSPACE/terraform/terraform.auto.tfvars
       
       - name: View SSH Key
         run: |
-          cat ~/.ssh/aws_ssh.pub
-          cat ~/.ssh/aws_ssh
+          cat /home/runner/.ssh/aws_ssh
+          cat /home/runner/.ssh/aws_ssh.pub
       
       - name: Fetch current IP and configure Terraform variables
         run: printf "ip_address = \"$(curl -s https://api.ipify.org)\"" > terraform/ip.auto.tfvars
@@ -67,25 +66,25 @@ jobs:
       - name: Run Docker playbook
         run: |
           ansible-playbook -i ansible/inventory.yml ansible/docker-playbook.yml \
-            --private-key ~/.ssh/aws_ssh \
+            --private-key /home/runner/.ssh/aws_ssh \
             --ssh-common-args='-o StrictHostKeyChecking=accept-new'
       
       - name: Run Database playbook
         run: |
           ansible-playbook -i ansible/inventory.yml ansible/db-playbook.yml \
-            --private-key ~/.ssh/aws_ssh \
+            --private-key /home/runner/.ssh/aws_ssh \
             --ssh-common-args='-o StrictHostKeyChecking=accept-new'
       
       - name: Run Backend playbook
         run: |
           ansible-playbook -i ansible/inventory.yml ansible/backend-playbook.yml \
-            --private-key ~/.ssh/aws_ssh \
+            --private-key /home/runner/.ssh/aws_ssh \
             --ssh-common-args='-o StrictHostKeyChecking=accept-new'
       
       - name: Run Frontend playbook
         run: |
           ansible-playbook -i ansible/inventory.yml ansible/frontend-playbook.yml \
-            --private-key ~/.ssh/aws_ssh \
+            --private-key /home/runner/.ssh/aws_ssh \
             --ssh-common-args='-o StrictHostKeyChecking=accept-new'
       
       - name: Terminate infrastructure
