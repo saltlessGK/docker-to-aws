@@ -1,11 +1,11 @@
 ---
 - name: Setup frontend container
-  hosts: frontend
+  hosts: frontend_servers
   remote_user: ubuntu
   become: yes
   vars:
     PORT: "8081"
-    BACKEND_URL: "http://{{ hostvars['backend']['private_host'] }}:8080"
+    BACKEND_URL: "http://{{ hostvars['backend_alb']['dns_name'] }}:80"
   tasks:
     - name: Run frontend container
       community.docker.docker_container:

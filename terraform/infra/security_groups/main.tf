@@ -1,6 +1,37 @@
+resource "aws_security_group" "frontend_alb" {
+  name = "frontend-alb-sg"
+  description = "Allow global HTTP access"
+
+  # SSH (Manual) in
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = var.allowed_cidrs
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "frontend-alb-sg"
+  }
+}
+
 resource "aws_security_group" "frontend" {
   name = "frontend-sg"
-  description = "Allow global HTTP access"
+  description = "Allow HTTP traffic from frontend ALB"
 
   # SSH (Manual) in
   ingress {
@@ -22,7 +53,7 @@ resource "aws_security_group" "frontend" {
     from_port   = 8081
     to_port     = 8081
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.frontend_alb.id]
   }
 
   egress {
@@ -37,9 +68,40 @@ resource "aws_security_group" "frontend" {
   }
 }
 
+resource "aws_security_group" "backend_alb" {
+  name = "backend-alb-sg"
+  description = "Allow HTTP access from frontend instances"
+
+  # SSH in
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = var.allowed_cidrs
+  }
+
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.frontend.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "backend-alb-sg"
+  }
+}
+
 resource "aws_security_group" "backend" {
   name = "backend-sg"
-  description = "Allow HTTP access from frontend"
+  description = "Allow HTTP access from backend ALB"
 
   # SSH in
   ingress {
@@ -57,12 +119,11 @@ resource "aws_security_group" "backend" {
     prefix_list_ids = ["pl-0e4bcff02b13bef1e"]
   }
   
-  # HTTP in
   ingress {
     from_port       = 8080
     to_port         = 8080
     protocol        = "tcp"
-    security_groups = [aws_security_group.frontend.id]
+    security_groups = [aws_security_group.backend_alb.id]
   }
 
   egress {
@@ -117,6 +178,8 @@ resource "aws_security_group" "db" {
   }
 }
 
+output "frontend_alb_sg_id" {value = aws_security_group.frontend_alb.id}
 output "frontend_sg_id" {value = aws_security_group.frontend.id}
+output "backend_alb_sg_id" {value = aws_security_group.backend_alb.id}
 output "backend_sg_id"  {value = aws_security_group.backend.id}
 output "db_sg_id" {value = aws_security_group.db.id}
