@@ -38,11 +38,10 @@ jobs:
       
       - name: Setup SSH key
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.AWS_SSH }}" > ~/.ssh/aws_ssh
-          chmod 600 ~/.ssh/aws_ssh
-          echo "${{ secrets.AWS_PUBLIC }}" > ~/.ssh/aws_ssh.pub
-          chmod 644 ~/.ssh/aws_ssh.pub
+          printf '/home/runner/.ssh/aws_ssh\n\n\n' | ssh-keygen -t rsa -b 4096
+          chmod 600 /home/runner/.ssh/aws_ssh
+          chmod 644 /home/runner/.ssh/aws_ssh.pub
+          printf "ssh_public_key=\"/home/runner/.ssh/aws_ssh.pub\"\nallow_all_ip_addresses_to_db_server=true\n" > $GITHUB_WORKSPACE/terraform/terraform.auto.tfvars
       
       - name: Fetch current IP and configure Terraform variables
         run: printf "ip_address = \"$(curl -s https://api.ipify.org)\"" > terraform/ip.auto.tfvars
@@ -55,6 +54,9 @@ jobs:
       
       - name: Deploy infrastructure
         run: terraform -chdir=./terraform apply -auto-approve
+      
+      - name: Wait for servers to be ready
+        run: sleep 60
       
       - name: Run Docker playbook
         run: |
