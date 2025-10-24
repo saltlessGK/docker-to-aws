@@ -44,6 +44,11 @@ jobs:
           printf "${{ secrets.AWS_PUBLIC }}" > ~/.ssh/aws_ssh.pub
           chmod 644 ~/.ssh/aws_ssh.pub
       
+      - name: View SSH Key
+        run: |
+          cat ~/.ssh/aws_ssh.pub
+          cat ~/.ssh/aws_ssh
+      
       - name: Fetch current IP and configure Terraform variables
         run: printf "ip_address = \"$(curl -s https://api.ipify.org)\"" > terraform/ip.auto.tfvars
       
