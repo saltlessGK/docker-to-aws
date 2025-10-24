@@ -1,6 +1,6 @@
 ---
 - name: Setup backend container
-  hosts: backend
+  hosts: backend_servers
   remote_user: ubuntu
   become: yes
   vars:

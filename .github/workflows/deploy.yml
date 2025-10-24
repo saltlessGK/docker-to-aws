@@ -36,24 +36,25 @@ jobs:
           ansible-galaxy collection install community.docker
           pip3 install docker
       
-      - name: Setup SSH key
+      - name: Setup SSH keys
         run: |
           printf '/home/runner/.ssh/aws_ssh\n\n\n' | ssh-keygen -t rsa -b 4096
           chmod 600 /home/runner/.ssh/aws_ssh
           chmod 644 /home/runner/.ssh/aws_ssh.pub
-          printf "ssh_public_key=\"/home/runner/.ssh/aws_ssh.pub\"\nallow_all_ip_addresses_to_db_server=true\n" > $GITHUB_WORKSPACE/terraform/terraform.auto.tfvars
+          printf "ssh_public_key=\"/home/runner/.ssh/aws_ssh.pub\"\n" > $GITHUB_WORKSPACE/terraform/ssh.auto.tfvars
       
       - name: Fetch current IP and configure Terraform variables
         run: printf "ip_address = \"$(curl -s https://api.ipify.org)\"" > terraform/ip.auto.tfvars
       
-      - name: Initiate Terraform session
-        run: terraform -chdir=./terraform init
-      
-      - name: Validate Terraform configuration
-        run: terraform -chdir=./terraform validate
-      
+      - name: Configure Terraform S3
+        run: |
+          terraform -chdir=./terraform-bootstrap init
+          terraform -chdir=./terraform-bootstrap apply -auto-approve
+
       - name: Deploy infrastructure
-        run: terraform -chdir=./terraform apply -auto-approve
+        run: |
+          terraform -chdir=./terraform init
+          terraform -chdir=./terraform apply -auto-approve
       
       - name: Wait for servers to be ready
         run: sleep 60
@@ -81,6 +82,10 @@ jobs:
           ansible-playbook -i ansible/inventory.yml ansible/frontend-playbook.yml \
             --private-key ~/.ssh/aws_ssh \
             --ssh-common-args='-o StrictHostKeyChecking=accept-new'
+      
+      - name: Output application DNS
+        run: |
+          echo "Application can be accessed at: http://$(terraform -chdir=./terraform output app_dns | sed 's/^"\(.*\)"$/\1/')"
       
       - name: Terminate infrastructure
         if: ${{ !success() }}
