@@ -6,7 +6,7 @@ terraform {
     }
   }
   backend "s3" {
-    bucket  = "terraform-state-saltlessGK"
+    bucket  = "terraform-state-saltlessgk"
     key     = "./terraform.tfstate"
     region  = "us-east-1"
     encrypt = true
