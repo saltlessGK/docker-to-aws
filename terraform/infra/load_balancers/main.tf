@@ -3,7 +3,7 @@ data "aws_subnet" "subnet_1" {
     name   = "availabilityZone"
     values = ["us-east-1c"]
   }
-  vpc_id = "vpc-08283b72d7bd9c1c0"
+  vpc_id = "vpc-00b23d89beb05eb48"
 }
 
 data "aws_subnet" "subnet_2" {
@@ -11,7 +11,7 @@ data "aws_subnet" "subnet_2" {
     name   = "availabilityZone"
     values = ["us-east-1d"]
   }
-  vpc_id = "vpc-08283b72d7bd9c1c0"
+  vpc_id = "vpc-00b23d89beb05eb48"
 }
 
 resource "aws_lb" "frontend" {
@@ -26,7 +26,7 @@ resource "aws_lb_target_group" "frontend" {
   name     = "frontend-tg"
   port     = 8081
   protocol = "HTTP"
-  vpc_id   = "vpc-08283b72d7bd9c1c0"
+  vpc_id   = "vpc-00b23d89beb05eb48"
 }
 
 resource "aws_lb_listener" "frontend" {
@@ -66,7 +66,7 @@ resource "aws_lb_target_group" "backend" {
   name     = "backend-tg"
   port     = 8080
   protocol = "HTTP"
-  vpc_id   = "vpc-08283b72d7bd9c1c0"
+  vpc_id   = "vpc-00b23d89beb05eb48"
 }
 
 resource "aws_lb_listener" "backend" {
