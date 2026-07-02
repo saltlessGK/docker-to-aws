@@ -1,7 +1,7 @@
 # COSC2759 Assignment 2 - Semester 2, 2025
+_Coursework for **Systems Deployment and Operations** (RMIT-COSC2759)_
 
 # Services
-
 
 ## Backend
 This is the Backend Posts Service. It is responsible for talking to the Posts DB, and exposing an internal HTTP API for managing Posts.
@@ -41,12 +41,12 @@ This is the Frontend Posts Service. It is responsible for serving a UI to users 
 ### Image
 The Frontend service image is available at `rmitdominichynes/sdo-2025:frontend`.
 
-# Running The Services Locally (In Docker)
+# Local Deployment in Docker Desktop
 
 1. Run `docker compose up -d` to start the two services, and a postgres database container.
 2. View the Frontend Posts Service at `http://localhost:8081`, and the Backend Posts Service at `http://localhost:8080`.
 
-## Deploying From Local Repository
+## Services Deployment on AWS EC2
 
 This repository is designed to work on WSL Ubuntu (or any other native Linux distributions).
 
