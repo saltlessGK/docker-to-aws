@@ -1,4 +1,4 @@
-# COSC2759 Assignment 2 - Semester 2, 2025
+# Simplified DockerImage-to-AWS Deployment Pipeline
 _Coursework for **Systems Deployment and Operations** (RMIT-COSC2759)_
 
 # Services
